@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#253a36">
+  <title>Village Guardians | حماة الديرة</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="game-app" id="gameApp">
+    <section class="game-frame" aria-label="Village Guardians game">
+      <canvas id="gameCanvas" tabindex="0" aria-label="Village Guardians playfield"></canvas>
+      <header class="hud" aria-label="Game status">
+        <div class="brand-mark"><span class="brand-ar" lang="ar">حماة الديرة</span><span class="brand-en">Village Guardians</span></div>
+        <div class="hud-stats">
+          <div class="stat health-stat"><span class="stat-label" data-i18n="health">Health</span><span id="healthValue" class="hearts">●●●</span></div>
+          <div class="stat"><span class="stat-label" data-i18n="score">Score</span><strong id="scoreValue">0</strong></div>
+          <div class="stat timer-stat"><span class="stat-label" data-i18n="time">Time</span><strong id="timerValue">1:00</strong></div>
+          <div class="stat dash-stat"><span class="stat-label" data-i18n="dash">Dash</span><span id="dashValue">Ready</span></div>
+          <div class="stat detail-stat"><span class="stat-label" data-i18n="weapon">Weapon</span><span id="weaponValue">Slingshot</span></div>
+          <div class="stat detail-stat"><span class="stat-label" data-i18n="item">Item</span><span id="itemValue">—</span></div>
+        </div>
+        <div class="hud-actions">
+          <button id="languageButton" class="icon-button" type="button" aria-label="Switch language">ع / A</button>
+          <button id="soundButton" class="icon-button" type="button" aria-label="Toggle sound">♪</button>
+          <button id="pauseButton" class="icon-button" type="button" aria-label="Pause game">Ⅱ</button>
+        </div>
+      </header>
+      <aside id="rankingPanel" class="ranking-panel" aria-label="Round ranking">
+        <div class="ranking-title"><span data-i18n="ranking">Ranking</span><strong id="rankValue">1 / 1</strong></div>
+        <ol id="liveRanking"></ol>
+      </aside>
+      <div id="demoBadge" class="demo-badge hidden" aria-live="polite">Demo ×3</div>
+      <div id="notice" class="notice" role="status" aria-live="polite" aria-atomic="true"></div>
+
+      <div id="menuOverlay" class="overlay menu-overlay">
+        <div class="panel menu-panel">
+          <div class="ornament" aria-hidden="true"></div>
+          <p class="eyebrow" data-i18n="welcome">A 60-second village challenge</p>
+          <h1><span lang="ar">حماة الديرة</span><small>Village Guardians</small></h1>
+          <p class="menu-copy" data-i18n="intro">Defend the village… race for the treasure!</p>
+          <div class="setup-grid">
+            <label><span data-i18n="difficulty">Difficulty</span><select id="difficultySelect"><option value="easy" data-i18n="easy">Easy</option><option value="normal" data-i18n="normal">Normal</option><option value="hard" data-i18n="hard">Hard</option></select></label>
+            <label><span data-i18n="bots">Computer bots</span><select id="botSelect"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
+          </div>
+          <p class="setup-note" data-i18n="botNote">Bots are local rivals: they follow the same rules, fight monsters, and compete for treasure.</p>
+          <div class="menu-actions primary-actions"><button id="startButton" class="button primary" type="button" data-i18n="start">Start round</button><button id="storyButton" class="button secondary" type="button" data-i18n="story">Story</button><button id="loadExampleButton" class="button ghost" type="button" data-i18n="loadExample">Load demo example</button></div>
+          <label class="demo-control"><input id="demoToggle" type="checkbox"><span data-i18n="demo">Demo showcase — 3× speed</span></label>
+          <div class="audio-controls" role="group" data-i18n-label="audioOptions" aria-label="Audio options"><label><input id="musicToggle" type="checkbox"><span data-i18n="music">Music</span></label><label><input id="sfxToggle" type="checkbox"><span data-i18n="soundEffects">Sound effects</span></label></div>
+          <p class="demo-explanation" data-i18n="demoHelp">Off by default. Demo results are saved separately from normal rounds.</p>
+          <p class="best-line"><span data-i18n="best">Best</span>: <strong id="bestMenuValue">0</strong> <span class="treasure-mark" aria-hidden="true">◆</span> <small id="bestModeLabel"></small></p>
+          <div class="instruction-grid">
+            <div><span class="instruction-icon">↗</span><strong data-i18n="moveTitle">Move</strong><p data-i18n="moveHelp">WASD / arrows or left stick</p></div>
+            <div><span class="instruction-icon">◎</span><strong data-i18n="aimTitle">Aim &amp; fire</strong><p data-i18n="aimHelp">Mouse hold or right stick</p></div>
+            <div><span class="instruction-icon">✦</span><strong data-i18n="dashTitle">Dash</strong><p data-i18n="dashHelp">Space or dash button</p></div>
+            <div><span class="instruction-icon">◆</span><strong data-i18n="itemTitle">Item</strong><p data-i18n="itemHelp">E or the Item button</p></div>
+          </div>
+          <details class="art-preview" id="previewDetails">
+            <summary><span data-i18n="previewSummary">Characters &amp; monsters</span><span aria-hidden="true">⌄</span></summary>
+            <section aria-labelledby="previewTitle">
+              <div class="preview-heading"><div><p class="eyebrow" data-i18n="previewEyebrow">Meet the village adventurers</p><h2 id="previewTitle" data-i18n="previewTitle">Character &amp; monster preview</h2></div><p data-i18n="previewHelp">Six local adventurers and three creature types, drawn at play size and detail size.</p></div>
+              <div class="preview-grid">
+                <figure><figcaption data-i18n="actualSize">Actual gameplay size</figcaption><canvas id="actualPreview" width="640" height="164" role="img" aria-label="Actual gameplay size characters and monsters"></canvas></figure>
+                <figure><figcaption data-i18n="detailSize">Detail ×3</figcaption><canvas id="detailPreview" width="640" height="240" role="img" aria-label="Enlarged characters and monsters"></canvas></figure>
+              </div>
+            </section>
+          </details>
+        </div>
+      </div>
+
+      <div id="cinematicOverlay" class="cinematic-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="cinematicTitle">
+        <button id="skipCinematicButton" class="button cinematic-skip" type="button" data-i18n="skipStory">Skip</button>
+        <div class="cinematic-copy">
+          <p id="cinematicEyebrow" class="eyebrow" aria-live="polite"></p>
+          <h2 id="cinematicTitle">The Festival</h2>
+          <p id="cinematicText"></p>
+          <strong id="cinematicCountdown" aria-live="polite"></strong>
+        </div>
+      </div>
+
+      <div id="pauseOverlay" class="overlay hidden"><div class="panel compact-panel"><p class="eyebrow" data-i18n="pausedEyebrow">The square is quiet</p><h2 data-i18n="paused">Paused</h2><div class="menu-actions stacked"><button id="resumeButton" class="button primary" type="button" data-i18n="resume">Resume</button><button id="restartPauseButton" class="button secondary" type="button" data-i18n="restart">Restart</button><button id="menuPauseButton" class="button ghost" type="button" data-i18n="mainMenu">Main menu</button></div></div></div>
+      <div id="resultsOverlay" class="overlay hidden"><div class="panel results-panel"><p class="eyebrow" data-i18n="roundComplete">Round complete</p><h2 data-i18n="resultTitle">The village rests</h2><div class="result-score"><span data-i18n="finalScore">Final score</span><strong id="finalScore">0</strong></div><div class="result-grid"><p><span data-i18n="treasure">Treasure</span><strong id="treasureResult">0</strong></p><p><span data-i18n="defeated">Defeated</span><strong id="defeatedResult">0</strong></p><p><span data-i18n="deaths">Respawns</span><strong id="deathsResult">0</strong></p><p><span data-i18n="best">Best</span><strong id="bestResult">0</strong></p></div><section class="final-ranking"><h3 data-i18n="finalRanking">Final ranking</h3><ol id="finalRanking"></ol></section><p id="demoResult" class="demo-result hidden" data-i18n="demoResult">Demo-speed record</p><div class="menu-actions"><button id="restartButton" class="button primary" type="button" data-i18n="restart">Restart</button><button id="menuResultButton" class="button secondary" type="button" data-i18n="mainMenu">Main menu</button></div></div></div>
+
+      <div id="mobileControls" class="mobile-controls" aria-label="Touch controls"><div id="moveZone" class="joystick-zone move-zone" aria-label="Movement joystick"><div id="moveStick" class="stick"></div><span class="control-label" data-i18n="moveTitle">Move</span></div><div id="aimZone" class="joystick-zone aim-zone" aria-label="Aim and fire joystick"><div id="aimStick" class="stick"></div><span class="control-label" data-i18n="aimTitle">Aim &amp; fire</span></div><button id="dashButton" class="dash-button" type="button"><span>✦</span><small data-i18n="dash">Dash</small></button><button id="itemButton" class="item-button" type="button"><span>◆</span><small data-i18n="useItem">Use item</small></button></div>
+    </section>
+    <p id="srStatus" class="sr-only" role="status" aria-live="polite"></p>
+  </main>
+  <script src="sample-data/data.js"></script><script src="game.js"></script>
+</body>
+</html>
